@@ -1,0 +1,250 @@
+(function($)
+{
+    $(document).ready(function()
+    {
+    	//console.log('start');
+        // Check if there was a saved application state
+        var stateCookie = org.cometd.COOKIE?org.cometd.COOKIE.get('org.cometd.demo.state'):null;
+        var state = stateCookie ? org.cometd.JSON.fromJSON(stateCookie) : null;
+        var chat = new Chat(state);
+
+        // restore some values
+        if (state)
+        {
+            $('#result').val(state.username);
+            $('#useServer').attr('checked',state.useServer);
+            $('#altServer').val(state.altServer);
+        }
+
+        // Setup UI
+        $('#join').show();        
+        $('#altServer').attr('autocomplete', 'off');
+        $('#sendStopButton').click(function() { chat.join(); });       
+        $('#result').attr('autocomplete', 'off').focus();        
+        $('#phrase').attr('autocomplete', 'off');
+        $('#phrase').keyup(function(e)
+        {
+            if (e.keyCode == 13)
+            {
+                chat.send();
+            }
+        });
+    });
+
+    function Chat(state)
+    {
+        var _self = this;
+        var _wasConnected = false;
+        var _connected = false;
+        var _phrase;
+        var _lastUser;
+        var _disconnecting;
+        var _chatSubscription;
+        var _channel;
+        var _sent = false;
+
+
+        this.join = function()
+        {
+        	//console.log('in join');
+    		//console.log("state " + _connected);
+        	if (_sent)
+        	{
+        		_self.leave()
+        		$('#sendStopButton').html('Send');  
+        		_sent = false;
+        		return;
+        	}
+            _disconnecting = false;
+            _channel = '/itb/demo';
+           
+            //var cometdURL = location.protocol + "//" + location.host + config.contextPath + "/cometd";
+            var cometdURL = location.protocol + "//" + location.host + "/cometd";
+             
+            var useServer = $('#useServer').attr('checked');
+            if (useServer)
+            {
+                var altServer = $('#altServer').val();
+                if (altServer.length == 0)
+                {
+                    alert('Please enter a server address');
+                    return;
+                }
+                cometdURL = altServer;
+            }
+            console.log(cometdURL);
+            $.cometd.configure({
+                url: cometdURL,
+                logLevel: 'info'
+            });
+            
+            $.cometd.handshake();
+            //console.log("handshake called");
+            $('#phrase').focus();
+            
+        };
+
+        this.leave = function()
+        {
+            $.cometd.batch(function()
+            {                
+                _unsubscribe();
+            });
+            $.cometd.disconnect();
+
+            
+            $('#result').focus();
+
+            _phrase = null;
+            _lastUser = null;
+            _disconnecting = true;
+        };
+
+        this.send = function()
+        {
+        	$('#sendStopButton').html('Stop');
+            var phrase = $('#phrase');
+            var text = phrase.val();
+            
+
+            if (!text || !text.length) 
+            {
+            	alert("Search String can't be empty..");
+            	return;
+            }
+           
+            //console.log("Sending " + text);
+            $.cometd.publish("/service/itb", {
+                room: _channel,
+            	phrase: text             
+            });
+            _sent = true;
+            
+        };
+
+        this.receive = function(message)
+        {
+        	//console.log("in receive");
+            console.log(message);
+                       
+	        var id = message.id;
+	        var posts = new Array();
+
+	        posts = message.data;
+	        //console.log(posts);
+	        
+	        var length = posts.length;
+	        //console.log(length);
+	        
+	        for (i=0;i<length;i++){
+	        	//console.log(posts[i]);
+	        	//_appendResults('', posts[i].img_url, posts[i].tweet_url, posts[i].tweet_data);
+	        	_appendResults('', posts[i].img_url, posts[i].tweet_url, posts[i].tweet_data, posts[i].activity_likelihood);
+	        }
+	                    
+        };
+
+        function _appendResults(id, i_url, t_url, t_data, likelihood)
+        {
+        	//console.log("in _appendResults");
+        	
+			//console.log(i_url);
+			
+			//$('#result').prepend('<div class="result" id="'+id+'"><a target="_blank" href="http://twitter.com/'+user+'/statuses/'+id+'"><img param="http://twitter.com/'+user+'/statuses/'+id+'" src="'+avatar+'" /></a><p>'+new_text+'</p></div>');
+			//$('#result').prepend ('<div class="result">'+'<a target="_blank" href="'+t_url+'"><img src="'+i_url+'"/></a><p>'+t_data+'</p></div>');
+			$('#result').prepend ('<div class="result">'+'<a target="_blank" href="'+t_url+'"><img src="'+i_url+'"/></a>&nbsp;&nbsp;'+t_data+'</div>');
+			$('#result').prepend ('<div class="liekihood">'+likelihood+'</div>');
+
+        }
+
+        function _unsubscribe()
+        {
+            if (_chatSubscription)
+            {
+                $.cometd.unsubscribe(_chatSubscription);
+            }
+            _chatSubscription = null;
+            
+        }
+
+  
+        function _connectionInitialized()
+        {
+            // first time connection for this client, so subscribe tell everybody.
+            $.cometd.batch(function()
+            {               
+                _chatSubscription = $.cometd.subscribe(_channel, _self.receive);
+               _self.send();
+            });
+        }
+
+      
+        function _metaChannelHandler(message){
+        	console.log("Message is "+ message.channel);
+            if (message.channel == "/meta/handshake" && message.successful)
+            {
+            	//console.log("/meta/handshake " + message.successful);   
+            	//if (_connected != true){
+                	_connectionInitialized();
+            	//}
+                if (_disconnecting)
+                {
+                    _connected = false;
+                }
+                else
+                {
+                    _wasConnected = _connected;
+                    _connected = message.successful === true;
+                    //console.log(_connected);
+                }
+            }
+            if (message.channel == "/meta/connect" && message.successful )
+            {
+            	
+            }
+        	
+        }
+        
+        $.cometd.addListener('/meta/handshake', _metaChannelHandler);       
+        $.cometd.addListener('/meta/connect', _metaChannelHandler);
+        $.cometd.addListener('/meta/disconnect', _metaChannelHandler);
+        $.cometd.addListener('/meta/subscribe', _metaChannelHandler);
+        $.cometd.addListener('/meta/publish', _metaChannelHandler);
+        $.cometd.addListener('/meta/unsubscribe', _metaChannelHandler);
+        $.cometd.addListener('/meta/unsuccessful', _metaChannelHandler);
+
+        // Restore the state, if present
+        if (state)
+        {
+            setTimeout(function()
+            {
+                // This will perform the handshake
+                _self.join(state.username);
+            }, 0);
+        }
+
+        $(window).unload(function()
+        {
+            if ($.cometd.reload)
+            {
+                $.cometd.reload();
+                // Save the application state only if the user was chatting
+                if (_wasConnected && _phrase)
+                {
+                    var expires = new Date();
+                    expires.setTime(expires.getTime() + 5 * 1000);
+                    org.cometd.COOKIE.set('org.cometd.demo.state', org.cometd.JSON.toJSON({
+                        username: _phrase,
+                        useServer: $('#useServer').attr('checked'),
+                        altServer: $('#altServer').val()
+                    }), { 'max-age': 5, expires: expires });
+                }
+            }
+            else
+            {
+                $.cometd.disconnect();
+            }
+        });
+    }
+
+})(jQuery);

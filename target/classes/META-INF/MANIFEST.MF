@@ -1,0 +1,42 @@
+Manifest-Version: 1.0
+Export-Package: com.serendio.connector.hbase;uses:="org.apache.hadoop.
+ conf,org.apache.hadoop.hbase.client,org.apache.hadoop.hbase.filter,or
+ g.json,org.apache.hadoop.hbase";version="2.4.3",com.serendio.REST;use
+ s:="javax.servlet,org.json";version="2.4.3",com.serendio.streaming;us
+ es:="javax.servlet,org.eclipse.jetty.server,org.eclipse.jetty.servlet
+ ,org.cometd.bayeux.server,org.eclipse.jetty.server.nio,org.eclipse.je
+ tty.server.handler,org.eclipse.jetty.util.thread,org.cometd.server,or
+ g.cometd.java.annotation,org.json,com.serendio.connector.hbase,org.co
+ metd.bayeux,org.cometd.server.filter,org.cometd.bayeux.client,javax.i
+ nject,org.cometd.server.authorizer";version="2.4.3"
+Built-By: jyadav
+Tool: Bnd-1.43.0
+Bundle-Name: CometD :: Java :: Examples
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: Dojo Foundation
+Bundle-ContactAddress: http://cometd.org/cometd-java/cometd-java-examp
+ les
+Build-Jdk: 1.6.0_37
+Bundle-Version: 2.4.3
+Bnd-LastModified: 1353986184976
+Bundle-ManifestVersion: 2
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0, http://www
+ .opensource.org/licenses/bsd-license.html, http://opensource-definiti
+ on.org/licenses/afl-2.1.html
+Bundle-Description: The CometD project is a scalable web messaging bus
+  that uses WebSocketand HTTP AJAX push technology patterns known as "
+ Comet" techniques
+Import-Package: javax.inject,javax.servlet;version="[2.5,3)",org.apach
+ e.hadoop.conf,org.apache.hadoop.hbase,org.apache.hadoop.hbase.client,
+ org.apache.hadoop.hbase.filter,org.cometd.bayeux;version="[2.4,3)",or
+ g.cometd.bayeux.client;version="[2.4,3)",org.cometd.bayeux.server;ver
+ sion="[2.4,3)",org.cometd.java.annotation;version="[2.4,3)",org.comet
+ d.server;version="[2.4,3)",org.cometd.server.authorizer;version="[2.4
+ ,3)",org.cometd.server.filter;version="[2.4,3)",org.eclipse.jetty.ser
+ ver;version="[7.6,9)",org.eclipse.jetty.server.handler;version="[7.6,
+ 9)",org.eclipse.jetty.server.nio;version="[7.6,9)",org.eclipse.jetty.
+ servlet;version="[7.6,9)",org.eclipse.jetty.util.thread;version="[7.6
+ ,9)",org.json
+Bundle-DocURL: http://docs.cometd.org
+Bundle-SymbolicName: cometd-java-examples
+

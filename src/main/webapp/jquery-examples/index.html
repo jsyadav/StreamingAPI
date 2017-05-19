@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+    <title>Serendio API</title>
+ 
+	<link rel="stylesheet" type="text/css" href="search.css">
+    <script type="text/javascript" src="cometd.js"></script>
+    <script type="text/javascript" src="jquery-1.7.2.js"></script>
+     <script type="text/javascript" src="json2.js"></script>
+    <script type="text/javascript" src="jquery.cometd.js"></script>
+    <script type="text/javascript" src="search.js"></script>
+    <script type="text/javascript" src="xml2json.js"></script>
+    <script type="text/javascript">
+        var config = {
+            contextPath: (new String(document.location).replace(/http:\/\/[^\/]*/, '').replace(/\/jquery-examples\/.*$/, ''))            
+        };
+        
+    </script>
+   
+</head>
+
+<body>
+<div id="main">
+	<div id="result"></div>
+    <div id="input">
+        <div id="join">
+            <table>
+                <tbody> 
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        Validity, min time (default 60sec, 0 for full table)
+                    </td>
+                    <td>
+                        <input id="validity" type="text" value="60" />
+                    </td>
+                    <td>
+
+                    </td>
+                </tr>
+                <tr>    
+                    <td>&nbsp;</td>
+                    <td>    
+                        Output format (default json)
+                    </td>   
+                    <td>    
+                        <input id="type" type="text" value="json" />
+                    </td>   
+                    <td>    
+        
+                    </td>   
+                </tr>   
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        Delay between tweets (default 2 sec)
+                    </td>
+                    <td>
+                        <input id="delay" type="text" value="2"/>
+                    </td>
+                    <td>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        Number of tweets (default 10)
+                    </td>
+                    <td>
+                        <input id="limit" type="text" value="10" />
+                    </td>
+                    <td>
+
+                    </td>
+                </tr>
+                          
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        Search String
+                    </td>
+                    <td>
+                        <input id="phrase" type="text" />
+                    </td>
+                    <td>
+                        <button id="sendStopButton" class="button">Send</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>                
+    </div>    
+</div>
+<br />
+<div style="padding: 0.25em;">Try different pharses and click Send button.</div>
+
+</body>
+</html>
